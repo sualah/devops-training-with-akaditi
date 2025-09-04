@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devops-training-deployment
+  labels:
+    app.kubernetes.io/name: devops-training-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: devops-training-deployment
+  template:
+    metadata:
+      labels:
+        app: devops-training-deployment
+    spec:
+      containers:
+        - name: devops-training-deployment
+          image: 269700396904.dkr.ecr.eu-central-1.amazonaws.com/training-repo:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3001
+              name: dls-port
+              protocol: TCP
+
+          # Load environment variables from configmap (flat key-value style)
+          envFrom:
+            - configMapRef:
+                name: ecodevsec-configmap
+          resources:
+            limits:
+              memory: "1200Mi"
+            requests:
+              memory: "1000Mi"
+
+      volumes:
+        - name: ecodevsec-volume
+          configMap:
+            name: ecodevsec-configmap
+            items:
+              - key: application.properties
+                path: application.properties
